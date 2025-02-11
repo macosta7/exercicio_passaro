@@ -51,6 +51,8 @@
         });
 
         passarinho.anims.play('fly', true); //Inicia a animação de voar
+        voando = 0;
+
     }
 
     function update() {
@@ -73,22 +75,24 @@
             passarinho.x -= 5;
         } */
 
-
-
         if(passarinho.x === 45){ //Determinando aonde o passarinho vai "bater" e virar no eixo x(esquerda)
             passarinho.setFlip(false, false);
             passarinho.ida = true;
+            voando++;
         }
         if(passarinho.x === 750){ //Determinando aonde o passarinho vai "bater" e virar no eixo x(direita)
             passarinho.setFlip(true, false);
             passarinho.ida = false;
+            voando++;
         }
 
         if(passarinho.y === 35 ){ //Determinando aonde o passarinho vai "bater" no eixo y(cima)
             passarinho.up = true;
+            voando++;
         }
         if(passarinho.y === 580){ //Determinando aonde o passarinho vai "bater" no eixo y(baixo)
             passarinho.up = false;
+            voando++;
         }
 
         if(passarinho.up){ //Determinando que quando o passarinho.up for true, ele vai subir
@@ -105,6 +109,10 @@
             passarinho.x -= 5;
         }
 
+        while(voando){
+            console.log("bati na parede: " + voando + " vezes");
+            break;
+        }
     }
 
 </script>
