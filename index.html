@@ -16,106 +16,132 @@
 </head>
 <body>
 
-<script>
+    <script>
 
-    var config = {      //O config serve para definir as configurações iniciais do jogo como: altura e largura
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
+        var config = {      //O config serve para definir as configurações iniciais do jogo como: altura e largura
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
 
-        scene: {
-            preload: preload, //A função que é chamada antes de começar o jogo e carrega os assets
-            create: create, //A função que é chamada ao iniciar o jogo, cria os objetos e adiciona os assets
-            update: update //A função que é chamada para fazer a lógica do jogo, é um loop
+            scene: {
+                preload: preload, //A função que é chamada antes de começar o jogo e carrega os assets
+                create: create, //A função que é chamada ao iniciar o jogo, cria os objetos e adiciona os assets
+                update: update //A função que é chamada para fazer a lógica do jogo, é um loop
+            }
+        };
+
+        var game = new Phaser.Game(config);
+
+        var passarinho;
+
+        function preload() { //Carregando os assets
+            this.load.image('bg', 'assets/floresta.png');
+            this.load.spritesheet('bird', 'assets/bird-purple.png', {frameWidth: 75, frameHeight: 75}); //Adicionando um spriteSheet(imagens com frames de movimentações)
+            this.load.spritesheet('bird2', 'assets/bird-red.png', {frameWidth: 75, frameHeight: 75});
         }
-    };
 
-    var game = new Phaser.Game(config);
-
-    var passarinho;
-
-    function preload() { //Carregando os assets
-        this.load.image('bg', 'assets/floresta.png');
-        this.load.spritesheet('bird', 'assets/bird-purple.png', {frameWidth: 75, frameHeight: 75}); //Adicionando um spriteSheet(imagens com frames de movimentações)
-    }
-
-    function create() { //Adicionando os assets
-        this.add.image(400, 300, 'bg').setScale(1.2);
-        passarinho = this.add.sprite(100, 300, 'bird').setScale(1.3); //Sprite é um objeto que suporta animações
+        function create() { //Adicionando os assets
+            this.add.image(400, 300, 'bg').setScale(1.2);
+            passarinho = this.add.sprite(100, 300, 'bird').setScale(1.3); //Sprite é um objeto que suporta animações
+            passarinho2 = this.add.sprite(750, 100, 'bird2').setScale(1.3);
         
-        this.anims.create({ //Criando a animação de voar
-            key: 'fly', //Nomeando a animação
-            frames: this.anims.generateFrameNumbers('bird', { start: 0, end: 7}), //Determinando o número de frames(0 a 7) porque a imagem tem 8 frames
-            frameRate: 10, //A quantidade de frames por segundo
-            repeat: -1 //Repetição contínua(loop)
-        });
+            this.anims.create({ //Criando a animação de voar
+                key: 'fly', //Nomeando a animação
+                frames: this.anims.generateFrameNumbers('bird', { start: 0, end: 7}), //Determinando o número de frames(0 a 7) porque a imagem tem 8 frames
+                frameRate: 10, //A quantidade de frames por segundo
+                repeat: -1 //Repetição contínua(loop)
+            });
+            passarinho.anims.play('fly', true); //Inicia a animação de voar
 
-        passarinho.anims.play('fly', true); //Inicia a animação de voar
-        voando = 0;
+            this.anims.create({ //Criando a animação de voar do passarinho2
+                key: 'fly2', 
+                frames: this.anims.generateFrameNumbers('bird2', { start: 0, end: 7}),
+                frameRate: 10, 
+                repeat: -1
+            });
+            passarinho2.anims.play('fly2', true);
 
-    }
-
-    function update() {
-        /*if(passarinho.x === 100){
-            passarinho.setFlip(false, false);
-            console.log("Se o passarinho estiver na posição x=100, ele irá andar para o lado ida, no caso para a direita e o setFlip determina que ele ficará do lado padrão da imagem carregada(direita, cima)");
-            passarinho.ida = true;
-        }
-        if(passarinho.x < 700 && passarinho.ida === true){
-            console.log("Se a posição do passarinho for menor do que 700 e a ida for true(indo para a direita) vai ser adicionado 5 a cada frame, no caso x=100, vai ficar x=105, 110, 115... até chegar em 700");
-            passarinho.x += 5;
-        }
-        if(passarinho.x === 700){
-            passarinho.setFlip(true, false);
-            console.log("Se o passarinho estiver na posição x=700, o lado ida irá ficar falso, ou seja, ele passará a andar para a esquerda, e o setFlip determina que o lado que o passarinho está virado(direita) irá mudar ficando(esquerda, cima)");
-            passarinho.ida = false;
-        }
-        if(passarinho.x > 100 && passarinho.ida === false){
-            console.log("Se a posição do passarinho for maior do que 100 e a ida dor false(indo para a esquerda) vai ser subtraido 5 a cada frame, no caso x=700, vai ficar x=695, 690, 685... até chegar em 100");
-            passarinho.x -= 5;
-        } */
-
-        if(passarinho.x === 45){ //Determinando aonde o passarinho vai "bater" e virar no eixo x(esquerda)
-            passarinho.setFlip(false, false);
-            passarinho.ida = true;
-            voando++;
-        }
-        if(passarinho.x === 750){ //Determinando aonde o passarinho vai "bater" e virar no eixo x(direita)
-            passarinho.setFlip(true, false);
-            passarinho.ida = false;
-            voando++;
+            bateu = 0;
+            contador = 0;
+            
         }
 
-        if(passarinho.y === 35 ){ //Determinando aonde o passarinho vai "bater" no eixo y(cima)
-            passarinho.up = true;
-            voando++;
-        }
-        if(passarinho.y === 580){ //Determinando aonde o passarinho vai "bater" no eixo y(baixo)
-            passarinho.up = false;
-            voando++;
-        }
+        function update() {
+            //Movimentacao do passarinho
+            if(passarinho.x === 45){ //Determinando aonde o passarinho vai "bater" e virar no eixo x(esquerda)
+                passarinho.setFlip(false, false);
+                passarinho.ida = true;
+                bateu++;
+         }
+            if(passarinho.x === 750){ //Determinando aonde o passarinho vai "bater" e virar no eixo x(direita)
+                passarinho.setFlip(true, false);
+                passarinho.ida = false;
+                bateu++;
+            }
 
-        if(passarinho.up){ //Determinando que quando o passarinho.up for true, ele vai subir
-            passarinho.y += 5;
-        }
-        else{ //Determinando que quando o passarinho.up for false, ele vai descer
-            passarinho.y -= 5;
-        }
+            if(passarinho.y === 35 ){ //Determinando aonde o passarinho vai "bater" no eixo y(cima)
+                passarinho.up = true;
+                bateu++;
+            }
+            if(passarinho.y === 580){ //Determinando aonde o passarinho vai "bater" no eixo y(baixo)
+                passarinho.up = false;
+                bateu++;
+            }
+
+            if(passarinho.up){ //Determinando que quando o passarinho.up for true, ele vai subir
+                passarinho.y += 5;
+            }
+            else{ //Determinando que quando o passarinho.up for false, ele vai descer
+                passarinho.y -= 5;
+            }
         
-        if(passarinho.ida){ //Determinando que quando o passarinho.ida for true, ele anda para a direita
-            passarinho.x += 5;
-        }
-        else{ //Determinando que quando o passarinho.ida for false, ele anda para a esquerda
-            passarinho.x -= 5;
+            if(passarinho.ida){ //Determinando que quando o passarinho.ida for true, ele anda para a direita
+                passarinho.x += 5;
+            }
+            else{ //Determinando que quando o passarinho.ida for false, ele anda para a esquerda
+                passarinho.x -= 5;
+            }
+
+
+            //Movimentacao do passarinho2
+            if(passarinho2.x === 45){ 
+                passarinho2.setFlip(false, false);
+                passarinho2.ida = true;
+            }
+            if(passarinho2.x === 750){ 
+                passarinho2.setFlip(true, false);
+                passarinho2.ida = false;
+            }
+
+            if(passarinho2.y === 35 ){ 
+                passarinho2.up = true;
+            }
+            if(passarinho2.y === 580){ 
+                passarinho2.up = false;
+            }
+
+            if(passarinho2.up){ 
+                passarinho2.y += 5;
+            }
+            else{ 
+                passarinho2.y -= 5;
+            }
+        
+            if(passarinho2.ida){ 
+                passarinho2.x += 5;
+            }
+            else{ 
+                passarinho2.x -= 5;
+            }
+
+            //Contador de vezes que o passarinho roxo bate na parede
+            while(contador == bateu){ //Quando o passarinho roxo bate na parede é adicionado +1 no "bateu" e por conta do while também vai ser adicionado +1 no "contador" e cada vez que isso acontece aparece no console a quantidade de vezes que o passarinho bate na parede
+                console.log("Roxinho bateu: " + bateu + " vezes"); //Mostra no console a quantidade de vezes que o roxo bateu na parede
+                contador++; //Adiciona +1 na variavel contador    
+            }
         }
 
-        while(voando){
-            console.log("bati na parede: " + voando + " vezes");
-            break;
-        }
-    }
-
-</script>
+    </script>
 
 </body>
 </html>
